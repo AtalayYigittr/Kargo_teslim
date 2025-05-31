@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kargo Sevkiyat Takip</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kargo Sevkiyat Takip</h1>
+            <div class="user-section">
+                <input type="text" id="username" placeholder="Kullanıcı Adı">
+                <input type="password" id="password" placeholder="Şifre">
+                <button id="loginBtn">Giriş</button>
+                <button id="logoutBtn" style="display: none;">Çıkış</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="barcode-section">
+                <input type="text" id="barcodeInput" placeholder="Barkod okutun veya girin..." autofocus>
+                <button id="scanBtn">Tara</button>
+                <div id="scanner-container" class="scanner-container"></div>
+            </div>
+
+            <div class="today-list">
+                <h2>Bugünkü Kayıtlar</h2>
+                <div class="cargo-list" id="cargoList"></div>
+                <div class="daily-summary">
+                    <p>Toplam Kargo: <span id="totalCount">0</span></p>
+                </div>
+            </div>
+
+            <div class="end-day-section" style="display: none;">
+                <h2>Gün Sonu Kaydı</h2>
+                <div class="summary-info">
+                    <p>Tarih: <span id="summaryDate"></span></p>
+                    <p>Toplam Kargo: <span id="summaryTotal"></span></p>
+                </div>
+                <input type="text" id="operatorName" placeholder="Mutabakat Yapan Kişi">
+                <div class="signature-pad-container">
+                    <canvas id="signaturePad"></canvas>
+                    <div class="signature-buttons">
+                        <button id="clearSignature">Temizle</button>
+                        <button id="saveEndDay">Kaydet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h2>Geçmiş Kayıtlar</h2>
+            <div id="historyList"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
