@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const username = document.getElementById('username');
     const password = document.getElementById('password');
+    const adminPanel = document.getElementById('adminPanel');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const usersList = document.getElementById('usersList');
+    const userLogs = document.getElementById('userLogs');
     const endDaySection = document.querySelector('.end-day-section');
     const operatorName = document.getElementById('operatorName');
     const saveEndDay = document.getElementById('saveEndDay');
@@ -24,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let todaysCargos = [];
     let scannedBarcodes = new Set();
     let isScanning = false;
+    let currentUser = null;
+    let loginTime = null;
 
     // Load data from localStorage
     function loadData() {
@@ -57,6 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
             cargoList.appendChild(div);
         });
         totalCount.textContent = todaysCargos.length;
+
+        // Admin panel updates
+        if (currentUser && currentUser.role === 'admin') {
+            adminPanel.style.display = 'block';
+            updateUsersList();
+            updateLogs();
+        } else {
+            adminPanel.style.display = 'none';
+        }
     }
 
     // Check if barcode was scanned before
@@ -111,15 +126,125 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Login functionality
-    loginBtn.addEventListener('click', () => {
-        if (username.value === 'admin' && password.value === 'admin123') {
-            isAdmin = true;
+    // Kullanıcı işlemleri
+    function addUser(newUsername, newPassword, role) {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        if (users.some(user => user.username === newUsername)) {
+            alert('Bu kullanıcı adı zaten kullanımda!');
+            return false;
+        }
+        
+        users.push({
+            username: newUsername,
+            password: newPassword,
+            role: role
+        });
+        
+        localStorage.setItem('users', JSON.stringify(users));
+        updateUsersList();
+        return true;
+    }
+
+    function updateUsersList() {
+        if (!currentUser || currentUser.role !== 'admin') return;
+        
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        usersList.innerHTML = users.map(user => `
+            <div class="user-item">
+                <div class="user-info">
+                    ${user.username}
+                    <span class="user-role">(${user.role})</span>
+                </div>
+                ${user.username !== 'admin' ? `
+                    <button onclick="deleteUser('${user.username}')">Sil</button>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    // Kullanıcı silme
+    window.deleteUser = (username) => {
+        if (!currentUser || currentUser.role !== 'admin') return;
+        
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const newUsers = users.filter(user => user.username !== username);
+        localStorage.setItem('users', JSON.stringify(newUsers));
+        updateUsersList();
+    };
+
+    // Log kayıtları
+    function addLog(action, username) {
+        const logs = JSON.parse(localStorage.getItem('userLogs')) || [];
+        logs.unshift({
+            timestamp: new Date().toLocaleString('tr-TR'),
+            action: action,
+            username: username
+        });
+        localStorage.setItem('userLogs', JSON.stringify(logs));
+        updateLogs();
+    }
+
+    function updateLogs() {
+        if (!currentUser || currentUser.role !== 'admin') return;
+        
+        const logs = JSON.parse(localStorage.getItem('userLogs')) || [];
+        userLogs.innerHTML = logs.map(log => `
+            <div class="log-item">
+                <span class="timestamp">${log.timestamp}</span>
+                <span class="username">${log.username}</span>
+                <span class="action">${log.action}</span>
+            </div>
+        `).join('');
+    }
+
+    // Login işlemi
+    function login(username, password) {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const user = users.find(u => u.username === username && u.password === password);
+        
+        if (user) {
+            currentUser = user;
+            loginTime = new Date();
+            addLog('Giriş yaptı', username);
+            
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'block';
             username.style.display = 'none';
             password.style.display = 'none';
-            endDaySection.style.display = 'block';
+            
+            if (user.role === 'admin') {
+                adminPanel.style.display = 'block';
+                updateUsersList();
+                updateLogs();
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+
+    // Logout işlemi
+    function logout() {
+        if (currentUser) {
+            const duration = Math.round((new Date() - loginTime) / 1000 / 60); // dakika
+            addLog(`Çıkış yaptı (${duration} dakika kaldı)`, currentUser.username);
+        }
+        
+        currentUser = null;
+        loginTime = null;
+        adminPanel.style.display = 'none';
+        loginBtn.style.display = 'block';
+        logoutBtn.style.display = 'none';
+        username.style.display = 'block';
+        password.style.display = 'block';
+        username.value = '';
+        password.value = '';
+    }
+
+    // Login functionality
+    loginBtn.addEventListener('click', () => {
+        if (login(username.value, password.value)) {
             updateUI();
         } else {
             alert('Hatalı kullanıcı adı veya şifre!');
@@ -128,15 +253,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Logout functionality
     logoutBtn.addEventListener('click', () => {
-        isAdmin = false;
-        loginBtn.style.display = 'block';
-        logoutBtn.style.display = 'none';
-        username.style.display = 'block';
-        password.style.display = 'block';
-        endDaySection.style.display = 'none';
-        username.value = '';
-        password.value = '';
+        logout();
         updateUI();
+    });
+
+    addUserBtn.addEventListener('click', () => {
+        const newUsername = document.getElementById('newUsername').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const role = document.getElementById('userRole').value;
+        
+        if (newUsername && newPassword) {
+            if (addUser(newUsername, newPassword, role)) {
+                addLog(`Yeni ${role} kullanıcı oluşturdu: ${newUsername}`, currentUser.username);
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+            }
+        } else {
+            alert('Kullanıcı adı ve şifre gerekli!');
+        }
     });
 
     // Barcode scanner

@@ -157,6 +157,73 @@ button:hover {
     margin-top: 10px;
 }
 
+.admin-panel {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.user-management {
+    margin-top: 20px;
+}
+
+.new-user-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.new-user-form input,
+.new-user-form select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    flex: 1;
+}
+
+.user-list {
+    margin-bottom: 20px;
+}
+
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.user-item .user-info {
+    flex: 1;
+}
+
+.user-item .user-role {
+    color: #666;
+    font-size: 0.9em;
+    margin-left: 10px;
+}
+
+.user-logs {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.log-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9em;
+}
+
+.log-item .timestamp {
+    color: #666;
+    margin-right: 10px;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -179,5 +246,15 @@ button:hover {
     .signature-pad-container {
         width: 100%;
         overflow-x: hidden;
+    }
+
+    .new-user-form {
+        flex-direction: column;
+    }
+    
+    .new-user-form input,
+    .new-user-form select,
+    .new-user-form button {
+        width: 100%;
     }
 }

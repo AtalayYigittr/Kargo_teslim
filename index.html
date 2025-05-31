@@ -19,6 +19,31 @@
             </div>
         </header>
 
+        <!-- Admin Paneli -->
+        <div id="adminPanel" class="admin-panel" style="display: none;">
+            <h2>Admin Paneli</h2>
+            <div class="user-management">
+                <h3>Kullanıcı Yönetimi</h3>
+                <div class="new-user-form">
+                    <input type="text" id="newUsername" placeholder="Yeni Kullanıcı Adı">
+                    <input type="password" id="newPassword" placeholder="Yeni Şifre">
+                    <select id="userRole">
+                        <option value="user">Normal Kullanıcı</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button id="addUserBtn">Kullanıcı Ekle</button>
+                </div>
+                <div class="user-list">
+                    <h4>Kayıtlı Kullanıcılar</h4>
+                    <div id="usersList"></div>
+                </div>
+                <div class="user-logs">
+                    <h4>Kullanıcı Logları</h4>
+                    <div id="userLogs"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="main-content">
             <div class="barcode-section">
                 <input type="text" id="barcodeInput" placeholder="Barkod okutun veya girin..." autofocus>
